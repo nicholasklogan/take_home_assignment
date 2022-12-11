@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, abort
 from http import HTTPStatus
 from src.extensions import db
 from src.models import DummyModel, Appointment
@@ -21,7 +21,10 @@ def index():
 @home.route('/schedule_appointment', methods=['POST'])
 @use_args({'doctor': fields.String(), 'start_time': fields.Float(), 'end_time': fields.Float()})
 def schedule_appointment(args):
-    new_record = Appointment(doctor=args.get('doctor'), start_time=args.get('start_time'), end_time=args.get('end_time'))
+    appointment_dict = {'doctor': args.get('doctor'), 'start_time': args.get('start_time'), 'end_time': args.get('end_time')}
+    if not Appointment.query.filter_by(**appointment_dict).first() == None:
+        abort(409)
+    new_record = Appointment(**appointment_dict)
     db.session.add(new_record)
     db.session.commit()
     return new_record.json()
