@@ -1,5 +1,7 @@
 import datetime
 from http import HTTPStatus
+from src.models import Appointment
+
 
 def test_successfully_create_appointment_doctor_who(client):
     json_value = {
@@ -13,7 +15,7 @@ def test_successfully_create_appointment_doctor_who(client):
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json == json_value
-
+    assert Appointment.query.filter_by(**json_value).first() == json_value
 
 
 def test_home_api(client):
