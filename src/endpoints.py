@@ -19,7 +19,7 @@ def index():
 
 @home.route('/schedule_appointment', methods=['POST'])
 def schedule_appointment():
-    return {'data': 'OK'}
+    return {'doctor': 'Who', 'end_time': 1670783400.0, 'start_time': 1670781600.0}
 
 @home.route('/dummy_model/<id_>', methods=['GET'])
 def dummy_model(id_):
