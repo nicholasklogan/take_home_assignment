@@ -22,7 +22,11 @@ def index():
 @use_args({'doctor': fields.String(), 'start_time': fields.Float(), 'end_time': fields.Float()})
 def schedule_appointment(args):
     appointment_dict = {'doctor': args.get('doctor'), 'start_time': args.get('start_time'), 'end_time': args.get('end_time')}
-    if not Appointment.query.filter_by(**appointment_dict).first() == None:
+    if not Appointment.query.filter(
+            Appointment.doctor==appointment_dict['doctor'],
+            Appointment.start_time <= appointment_dict['start_time'],
+            Appointment.end_time >= appointment_dict['start_time']
+    ).first() == None:
         abort(409)
     new_record = Appointment(**appointment_dict)
     db.session.add(new_record)
