@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from http import HTTPStatus
 from src.extensions import db
-from src.models import DummyModel
+from src.models import DummyModel, Appointment
 from webargs import fields
 from webargs.flaskparser import use_args
 
@@ -17,9 +17,15 @@ home = Blueprint('/', __name__)
 def index():
     return {'data': 'OK'}
 
+
 @home.route('/schedule_appointment', methods=['POST'])
-def schedule_appointment():
-    return {'doctor': 'Who', 'end_time': 1670783400.0, 'start_time': 1670781600.0}
+@use_args({'doctor': fields.String(), 'start_time': fields.Float(), 'end_time': fields.Float()})
+def schedule_appointment(args):
+    new_record = Appointment(doctor=args.get('doctor'), start_time=args.get('start_time'), end_time=args.get('end_time'))
+    db.session.add(new_record)
+    db.session.commit()
+    return new_record.json()
+
 
 @home.route('/dummy_model/<id_>', methods=['GET'])
 def dummy_model(id_):

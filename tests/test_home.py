@@ -9,13 +9,18 @@ def test_successfully_create_appointment_doctor_who(client):
         "start_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=0, second=0).timestamp(),
         "end_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=30, second=0).timestamp()
     }
+
     response = client.post(
         "/schedule_appointment",
         json=json_value
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json == json_value
-    assert Appointment.query.filter_by(**json_value).first() == json_value
+    db_value = Appointment.query.filter_by(**json_value).first()
+    assert db_value.doctor == json_value['doctor']
+    assert db_value.start_time == json_value['start_time']
+    assert db_value.end_time == json_value['end_time']
+
 
 
 def test_home_api(client):
