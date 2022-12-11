@@ -34,11 +34,19 @@ def end_time_overlaps(appointment: dict) -> bool:
             Appointment.end_time >= appointment['end_time']
             ).first() == None
 
+
+def enveloping_overlap(appointment: dict) -> bool:
+    return not Appointment.query.filter(
+            Appointment.doctor==appointment['doctor'],
+            Appointment.start_time >= appointment['start_time'],
+            Appointment.end_time <= appointment['end_time']
+            ).first() == None
+
 @home.route('/schedule_appointment', methods=['POST'])
 @use_args({'doctor': fields.String(), 'start_time': fields.Float(), 'end_time': fields.Float()})
 def schedule_appointment(args):
     appointment_dict = {'doctor': args.get('doctor'), 'start_time': args.get('start_time'), 'end_time': args.get('end_time')}
-    if start_time_overlaps(appointment_dict) or end_time_overlaps(appointment_dict):
+    if start_time_overlaps(appointment_dict) or end_time_overlaps(appointment_dict) or enveloping_overlap(appointment_dict):
         abort(409)
 
     new_record = Appointment(**appointment_dict)
