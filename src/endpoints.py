@@ -17,6 +17,9 @@ home = Blueprint('/', __name__)
 def index():
     return {'data': 'OK'}
 
+@home.route('/schedule_appointment', methods=['POST'])
+def schedule_appointment():
+    return {'data': 'OK'}
 
 @home.route('/dummy_model/<id_>', methods=['GET'])
 def dummy_model(id_):
