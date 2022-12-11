@@ -47,6 +47,34 @@ def test_direct_conflict_create_appointment_doctor_who(client):
     assert len(Appointment.query.filter_by(**json_value).all()) == 1
 
 
+def test_start_time_overlap_create_appointment_doctor_who(client):
+    # Setup
+    first_appointment = {
+        "doctor": "Who",
+        "start_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=0, second=0).timestamp(),
+        "end_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=30, second=0).timestamp()
+    }
+    second_appointment = {
+        "doctor": "Who",
+        "start_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=15, second=0).timestamp(),
+        "end_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=30, second=0).timestamp()
+    }
+    response = client.post(
+        "/schedule_appointment",
+        json=first_appointment
+    )
+    assert response.status_code == HTTPStatus.OK
+    # Test
+    response = client.post(
+        "/schedule_appointment",
+        json=second_appointment
+    )
+    # Verify
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert Appointment.query.filter_by(**second_appointment).first() == None
+
+
+
 def test_home_api(client):
     response = client.get('/')
     assert response.status_code == HTTPStatus.OK
