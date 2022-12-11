@@ -4,16 +4,19 @@ from src.models import Appointment
 
 
 def test_successfully_create_appointment_doctor_who(client):
+    # Setup
     json_value = {
         "doctor": "Who",
         "start_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=0, second=0).timestamp(),
         "end_time": datetime.datetime(year=2022, month=12, day=11, hour=13, minute=30, second=0).timestamp()
     }
-
+    # Test
     response = client.post(
         "/schedule_appointment",
         json=json_value
     )
+
+    # Verify
     assert response.status_code == HTTPStatus.OK
     assert response.json == json_value
     db_value = Appointment.query.filter_by(**json_value).first()
@@ -34,10 +37,12 @@ def test_direct_conflict_create_appointment_doctor_who(client):
         json=json_value
     )
     assert response.status_code == HTTPStatus.OK
+    # Test
     response = client.post(
         "/schedule_appointment",
         json=json_value
     )
+    # Verify
     assert response.status_code == HTTPStatus.CONFLICT
     assert len(Appointment.query.filter_by(**json_value).all()) == 1
 
